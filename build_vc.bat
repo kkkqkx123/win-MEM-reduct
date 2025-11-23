@@ -12,6 +12,16 @@ if exist "%ProgramFiles%\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\
 	goto start
 )
 
+if exist "%ProgramFiles%\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" (
+	call "%ProgramFiles%\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" amd64_arm64
+	goto start
+)
+
+if exist "D:\softwares\Visual Studio\VC\Auxiliary\Build\vcvarsall.bat" (
+	call "D:\softwares\Visual Studio\VC\Auxiliary\Build\vcvarsall.bat" amd64_arm64
+	goto start
+)
+
 echo VS 2022 not found...
 
 goto end
