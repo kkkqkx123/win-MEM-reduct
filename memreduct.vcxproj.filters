@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Header Files">
@@ -18,10 +18,10 @@
     <ClCompile Include="src\main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\routine\src\routine.c">
+    <ClCompile Include="routine\src\routine.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\routine\src\rapp.c">
+    <ClCompile Include="routine\src\rapp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,22 +35,22 @@
     <ClInclude Include="src\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\routine\src\rconfig.h">
+    <ClInclude Include="routine\src\rconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\routine\src\routine.h">
+    <ClInclude Include="routine\src\routine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\routine\src\rtypes.h">
+    <ClInclude Include="routine\src\rtypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\routine\src\ntapi.h">
+    <ClInclude Include="routine\src\ntapi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\routine\src\ntrtl.h">
+    <ClInclude Include="routine\src\ntrtl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\routine\src\rapp.h">
+    <ClInclude Include="routine\src\rapp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
