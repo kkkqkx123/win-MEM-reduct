@@ -363,6 +363,9 @@
     <ClCompile Include="routine\src\routine.c" />
     <ClCompile Include="src\main.c" />
     <ClCompile Include="src\wsl_helper.c" />
+    <ClCompile Include="src\config_utils.c" />
+    <ClCompile Include="src\ui_utils.c" />
+    <ClCompile Include="src\icon_manager.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="routine\src\ntapi.h" />
@@ -374,6 +377,9 @@
     <ClInclude Include="src\app.h" />
     <ClInclude Include="src\main.h" />
     <ClInclude Include="src\resource.h" />
+    <ClInclude Include="src\config_utils.h" />
+    <ClInclude Include="src\ui_utils.h" />
+    <ClInclude Include="src\icon_manager.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\resource.rc" />

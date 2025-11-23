@@ -1,0 +1,173 @@
+// Mem Reduct
+// Copyright (c) 2011-2025 Henry++
+
+#include "ui_utils.h"
+
+INT WINAPIV compare_numbers (
+	_In_opt_ PVOID context,
+	_In_ LPCVOID ptr1,
+	_In_ LPCVOID ptr2
+)
+{
+	ULONG_PTR val1;
+	ULONG_PTR val2;
+
+	val1 = *(PULONG_PTR)ptr1;
+	val2 = *(PULONG_PTR)ptr2;
+
+	if (val1 < val2)
+		return -1;
+
+	if (val1 > val2)
+		return 1;
+
+	return 0;
+}
+
+VOID _app_generate_array (
+	_Out_ _Writable_elements_ (count) PULONG_PTR integers,
+	_In_ ULONG_PTR count,
+	_In_ ULONG_PTR value
+)
+{
+	PR_HASHTABLE hashtable;
+	ULONG_PTR enum_key = 0;
+	ULONG hash_code;
+	ULONG_PTR index;
+
+	RtlSecureZeroMemory (integers, sizeof (ULONG_PTR) * (SIZE_T)count);
+
+	hashtable = _r_obj_createhashtable (sizeof (BOOLEAN), 16, NULL);
+
+	for (index = 1; index < 9; index++)
+	{
+		_r_obj_addhashtableitem (hashtable, (ULONG)(index * 10), NULL);
+	}
+
+	for (index = value - 2; index <= (value + 2); index++)
+	{
+		if (index >= 5)
+			_r_obj_addhashtableitem (hashtable, (ULONG)index, NULL);
+	}
+
+	index = 0;
+
+	while (_r_obj_enumhashtable (hashtable, NULL, &hash_code, (PULONG_PTR)&enum_key))
+	{
+		if (hash_code <= 99)
+			*(PULONG_PTR)PTR_ADD_OFFSET (integers, index * sizeof (ULONG_PTR)) = (ULONG_PTR)hash_code;
+
+		if (++index >= count)
+			break;
+	}
+
+	qsort_s ((void*)integers, (SIZE_T)count, sizeof (ULONG_PTR), &compare_numbers, NULL);
+
+	_r_obj_dereference (hashtable);
+}
+
+VOID _app_generate_menu (
+	_In_ HMENU hsubmenu,
+	_In_ UINT menu_idx,
+	_Out_ _Writable_elements_ (count) PULONG_PTR integers,
+	_In_ ULONG_PTR count,
+	_In_ LPCWSTR format,
+	_In_ LONG_PTR value,
+	_In_ BOOLEAN is_enabled
+)
+{
+	WCHAR buffer[64];
+	LONG_PTR menu_value;
+	ULONG menu_items = 0;
+	ULONG menu_id;
+	BOOLEAN is_checked = FALSE;
+
+	_r_menu_setitemtext (hsubmenu, 0, TRUE, _r_locale_getstring (IDS_TRAY_DISABLE));
+
+	_app_generate_array (integers, count, value);
+
+	for (UINT i = 0; i < count; i++)
+	{
+		menu_value = integers[i];
+
+		if (!menu_value)
+			continue;
+
+		menu_id = menu_idx + i;
+
+		_r_str_printf (buffer, RTL_NUMBER_OF (buffer), format, menu_value);
+
+		_r_menu_additem (hsubmenu, menu_id, buffer);
+
+		if (!_r_sys_iselevated ())
+			_r_menu_enableitem (hsubmenu, menu_id, FALSE, FALSE);
+
+		if (value == menu_value)
+		{
+			_r_menu_checkitem (hsubmenu, menu_id, menu_id, MF_BYCOMMAND, menu_id);
+
+			is_checked = TRUE;
+		}
+
+		menu_items += 1;
+	}
+
+	if (!is_enabled || !is_checked)
+		_r_menu_checkitem (hsubmenu, 0, menu_items + 2, MF_BYPOSITION, 0);
+}
+
+VOID _app_fontinit (
+	_Out_ PLOGFONT logfont,
+	_In_ LONG dpi_value
+)
+{
+	RtlZeroMemory (logfont, sizeof (LOGFONT));
+
+	_r_str_copy (logfont->lfFaceName, LF_FACESIZE, L"Lucida Console");
+
+	logfont->lfHeight = _r_dc_fontsizetoheight (8, dpi_value);
+	logfont->lfWeight = FW_NORMAL;
+
+	_r_config_getfont (L"TrayFont", logfont, dpi_value, NULL);
+
+	logfont->lfCharSet = DEFAULT_CHARSET;
+	logfont->lfQuality = CLEARTYPE_QUALITY;
+}
+
+VOID _app_drawbackground (
+	_In_ HDC hdc,
+	_In_ COLORREF bg_clr,
+	_In_ COLORREF pen_clr,
+	_In_ COLORREF brush_clr,
+	_In_ LPCRECT rect,
+	_In_ BOOLEAN is_round
+)
+{
+	HGDIOBJ prev_brush;
+	HGDIOBJ prev_pen;
+	COLORREF prev_clr;
+
+	prev_brush = SelectObject (hdc, GetStockObject (DC_BRUSH));
+	prev_pen = SelectObject (hdc, GetStockObject (DC_PEN));
+
+	prev_clr = SetBkColor (hdc, bg_clr);
+
+	SetDCPenColor (hdc, pen_clr);
+	SetDCBrushColor (hdc, brush_clr);
+
+	_r_dc_fillrect (hdc, rect, bg_clr);
+
+	if (is_round)
+	{
+		RoundRect (hdc, rect->left, rect->top, rect->right, rect->bottom, rect->right - 2, rect->right / 2);
+	}
+	else
+	{
+		Rectangle (hdc, rect->left, rect->top, rect->right, rect->bottom);
+	}
+
+	SelectObject (hdc, prev_brush);
+	SelectObject (hdc, prev_pen);
+
+	SetBkColor (hdc, prev_clr);
+}
