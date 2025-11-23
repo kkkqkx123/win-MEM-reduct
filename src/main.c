@@ -346,25 +346,67 @@ VOID _app_memoryclean (
 	else if (src == SOURCE_MANUAL)
 	{
 		if ((mask & REDUCT_WORKING_SET) == REDUCT_WORKING_SET)
-			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- " TITLE_WORKINGSET L"\r\n");
+		{
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- ");
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), _r_locale_getstring (IDS_WORKINGSET_CHK));
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"\r\n");
+		}
 
 		if ((mask & REDUCT_SYSTEM_FILE_CACHE) == REDUCT_SYSTEM_FILE_CACHE)
-			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- " TITLE_SYSTEMFILECACHE L"\r\n");
+		{
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- ");
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), _r_locale_getstring (IDS_SYSTEMFILECACHE_CHK));
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"\r\n");
+		}
 
 		if ((mask & REDUCT_MODIFIED_LIST) == REDUCT_MODIFIED_LIST)
-			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- " TITLE_MODIFIEDLIST L"\r\n");
+		{
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- ");
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), _r_locale_getstring (IDS_MODIFIEDLIST_CHK));
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"\r\n");
+		}
 
 		if ((mask & REDUCT_STANDBY_LIST) == REDUCT_STANDBY_LIST)
-			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- " TITLE_STANDBYLIST L"\r\n");
+		{
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- ");
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), _r_locale_getstring (IDS_STANDBYLIST_CHK));
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"\r\n");
+		}
 
 		if ((mask & REDUCT_STANDBY_PRIORITY0_LIST) == REDUCT_STANDBY_PRIORITY0_LIST)
-			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- " TITLE_STANDBYLISTPRIORITY0 L"\r\n");
+		{
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- ");
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), _r_locale_getstring (IDS_STANDBYLISTPRIORITY0_CHK));
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"\r\n");
+		}
 
 		if ((mask & REDUCT_REGISTRY_CACHE) == REDUCT_REGISTRY_CACHE)
-			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- " TITLE_REGISTRYCACHE L"\r\n");
+		{
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- ");
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), _r_locale_getstring (IDS_REGISTRYCACHE_CHK));
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"\r\n");
+		}
 
 		if ((mask & REDUCT_COMBINE_MEMORY_LISTS) == REDUCT_COMBINE_MEMORY_LISTS)
-			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- " TITLE_COMBINEMEMORYLISTS L"\r\n");
+		{
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- ");
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), _r_locale_getstring (IDS_COMBINEMEMORYLISTS_CHK));
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"\r\n");
+		}
+
+		if ((mask & REDUCT_WSL_CACHE_CLEAN) == REDUCT_WSL_CACHE_CLEAN)
+		{
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- ");
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), _r_locale_getstring (IDS_WSL_CACHE_CLEAN_CHK));
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"\r\n");
+		}
+
+		if ((mask & REDUCT_WSL_MEMORY_RECLAIM) == REDUCT_WSL_MEMORY_RECLAIM)
+		{
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"- ");
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), _r_locale_getstring (IDS_WSL_MEMORY_RECLAIM_CHK));
+			_r_str_append (buffer1, RTL_NUMBER_OF (buffer1), L"\r\n");
+		}
 
 		StrTrimW (buffer1, L"\r\n");
 
@@ -458,6 +500,30 @@ VOID _app_memoryclean (
 
 			if (!NT_SUCCESS (status))
 				_r_log (LOG_LEVEL_ERROR, NULL, L"NtSetSystemInformation", status, L"SystemCombinePhysicalMemoryInformation");
+		}
+	}
+
+	// WSL cache clean
+	if ((mask & REDUCT_WSL_CACHE_CLEAN) == REDUCT_WSL_CACHE_CLEAN)
+	{
+		WSL_CLEANUP_RESULT wsl_result = _app_wsl_cleanup_cache ();
+		
+		if (wsl_result != WSL_CLEANUP_SUCCESS)
+		{
+			LPCWSTR error_text = _app_get_wsl_error_text (wsl_result);
+			_r_log (LOG_LEVEL_ERROR, NULL, L"_app_wsl_cleanup_cache", wsl_result, error_text);
+		}
+	}
+
+	// WSL memory reclaim
+	if ((mask & REDUCT_WSL_MEMORY_RECLAIM) == REDUCT_WSL_MEMORY_RECLAIM)
+	{
+		WSL_CLEANUP_RESULT wsl_result = _app_wsl_reclaim_memory ();
+		
+		if (wsl_result != WSL_CLEANUP_SUCCESS)
+		{
+			LPCWSTR error_text = _app_get_wsl_error_text (wsl_result);
+			_r_log (LOG_LEVEL_ERROR, NULL, L"_app_wsl_reclaim_memory", wsl_result, error_text);
 		}
 	}
 
@@ -922,14 +988,14 @@ INT_PTR CALLBACK SettingsProc (
 
 					_r_listview_addcolumn (hwnd, IDC_REGIONS, 0, L"", 10, LVCFMT_LEFT);
 
-					_r_listview_additem (hwnd, IDC_REGIONS, 0, TITLE_WORKINGSET, I_DEFAULT, I_DEFAULT, REDUCT_WORKING_SET);
-					_r_listview_additem (hwnd, IDC_REGIONS, 1, TITLE_SYSTEMFILECACHE, I_DEFAULT, I_DEFAULT, REDUCT_SYSTEM_FILE_CACHE);
-					_r_listview_additem (hwnd, IDC_REGIONS, 2, TITLE_MODIFIEDLIST, I_DEFAULT, I_DEFAULT, REDUCT_MODIFIED_LIST);
-					_r_listview_additem (hwnd, IDC_REGIONS, 3, TITLE_STANDBYLIST, I_DEFAULT, I_DEFAULT, REDUCT_STANDBY_LIST);
-					_r_listview_additem (hwnd, IDC_REGIONS, 4, TITLE_STANDBYLISTPRIORITY0, I_DEFAULT, I_DEFAULT, REDUCT_STANDBY_PRIORITY0_LIST);
-					_r_listview_additem (hwnd, IDC_REGIONS, 5, TITLE_MODIFIEDFILECACHE, I_DEFAULT, I_DEFAULT, REDUCT_MODIFIED_FILE_CACHE);
-					_r_listview_additem (hwnd, IDC_REGIONS, 6, TITLE_REGISTRYCACHE, I_DEFAULT, I_DEFAULT, REDUCT_REGISTRY_CACHE);
-					_r_listview_additem (hwnd, IDC_REGIONS, 7, TITLE_COMBINEMEMORYLISTS, I_DEFAULT, I_DEFAULT, REDUCT_COMBINE_MEMORY_LISTS);
+					_r_listview_additem (hwnd, IDC_REGIONS, 0, _r_locale_getstring (IDS_WORKINGSET_CHK), I_DEFAULT, I_DEFAULT, REDUCT_WORKING_SET);
+					_r_listview_additem (hwnd, IDC_REGIONS, 1, _r_locale_getstring (IDS_SYSTEMFILECACHE_CHK), I_DEFAULT, I_DEFAULT, REDUCT_SYSTEM_FILE_CACHE);
+					_r_listview_additem (hwnd, IDC_REGIONS, 2, _r_locale_getstring (IDS_MODIFIEDLIST_CHK), I_DEFAULT, I_DEFAULT, REDUCT_MODIFIED_LIST);
+					_r_listview_additem (hwnd, IDC_REGIONS, 3, _r_locale_getstring (IDS_STANDBYLIST_CHK), I_DEFAULT, I_DEFAULT, REDUCT_STANDBY_LIST);
+					_r_listview_additem (hwnd, IDC_REGIONS, 4, _r_locale_getstring (IDS_STANDBYLISTPRIORITY0_CHK), I_DEFAULT, I_DEFAULT, REDUCT_STANDBY_PRIORITY0_LIST);
+					_r_listview_additem (hwnd, IDC_REGIONS, 5, _r_locale_getstring (IDS_MODIFIEDFILECACHE_CHK), I_DEFAULT, I_DEFAULT, REDUCT_MODIFIED_FILE_CACHE);
+					_r_listview_additem (hwnd, IDC_REGIONS, 6, _r_locale_getstring (IDS_REGISTRYCACHE_CHK), I_DEFAULT, I_DEFAULT, REDUCT_REGISTRY_CACHE);
+					_r_listview_additem (hwnd, IDC_REGIONS, 7, _r_locale_getstring (IDS_COMBINEMEMORYLISTS_CHK), I_DEFAULT, I_DEFAULT, REDUCT_COMBINE_MEMORY_LISTS);
 
 					_r_listview_setcolumn (hwnd, IDC_REGIONS, 0, NULL, -100);
 
@@ -2069,14 +2135,16 @@ INT_PTR CALLBACK DlgProc (
 					if (!hsubmenu)
 						break;
 
-					_r_menu_additem (hsubmenu, IDM_CLEAN_WORKINGSET, TITLE_WORKINGSET);
-					_r_menu_additem (hsubmenu, IDM_CLEAN_SYSTEMFILECACHE, TITLE_SYSTEMFILECACHE);
-					_r_menu_additem (hsubmenu, IDM_CLEAN_MODIFIEDFILECACHE, TITLE_MODIFIEDFILECACHE);
-					_r_menu_additem (hsubmenu, IDM_CLEAN_MODIFIEDLIST, TITLE_MODIFIEDLIST);
-					_r_menu_additem (hsubmenu, IDM_CLEAN_STANDBYLIST, TITLE_STANDBYLIST);
-					_r_menu_additem (hsubmenu, IDM_CLEAN_STANDBYLISTPRIORITY0, TITLE_STANDBYLISTPRIORITY0);
-					_r_menu_additem (hsubmenu, IDM_CLEAN_REGISTRYCACHE, TITLE_REGISTRYCACHE);
-					_r_menu_additem (hsubmenu, IDM_CLEAN_COMBINEMEMORYLISTS, TITLE_COMBINEMEMORYLISTS);
+					_r_menu_additem (hsubmenu, IDM_CLEAN_WORKINGSET, _r_locale_getstring (IDS_WORKINGSET_CHK));
+					_r_menu_additem (hsubmenu, IDM_CLEAN_SYSTEMFILECACHE, _r_locale_getstring (IDS_SYSTEMFILECACHE_CHK));
+					_r_menu_additem (hsubmenu, IDM_CLEAN_MODIFIEDFILECACHE, _r_locale_getstring (IDS_MODIFIEDFILECACHE_CHK));
+					_r_menu_additem (hsubmenu, IDM_CLEAN_MODIFIEDLIST, _r_locale_getstring (IDS_MODIFIEDLIST_CHK));
+					_r_menu_additem (hsubmenu, IDM_CLEAN_STANDBYLIST, _r_locale_getstring (IDS_STANDBYLIST_CHK));
+					_r_menu_additem (hsubmenu, IDM_CLEAN_STANDBYLISTPRIORITY0, _r_locale_getstring (IDS_STANDBYLISTPRIORITY0_CHK));
+					_r_menu_additem (hsubmenu, IDM_CLEAN_REGISTRYCACHE, _r_locale_getstring (IDS_REGISTRYCACHE_CHK));
+					_r_menu_additem (hsubmenu, IDM_CLEAN_COMBINEMEMORYLISTS, _r_locale_getstring (IDS_COMBINEMEMORYLISTS_CHK));
+					_r_menu_additem (hsubmenu, IDM_CLEAN_WSL_CACHE, _r_locale_getstring (IDS_WSL_CACHE_CLEAN_CHK));
+					_r_menu_additem (hsubmenu, IDM_CLEAN_WSL_MEMORY, _r_locale_getstring (IDS_WSL_MEMORY_RECLAIM_CHK));
 
 					if (_r_sys_isosversionlower (WINDOWS_8_1))
 						_r_menu_enableitem (hsubmenu, IDM_CLEAN_REGISTRYCACHE, FALSE, FALSE);
@@ -2248,15 +2316,17 @@ INT_PTR CALLBACK DlgProc (
 					{
 						mask = _r_config_getulong (L"ReductMask2", REDUCT_MASK_DEFAULT, NULL);
 
-						_r_menu_setitemtext (hsubmenu_region, IDM_WORKINGSET_CHK, FALSE, TITLE_WORKINGSET);
-						_r_menu_setitemtext (hsubmenu_region, IDM_SYSTEMFILECACHE_CHK, FALSE, TITLE_SYSTEMFILECACHE);
-						_r_menu_setitemtext (hsubmenu_region, IDM_MODIFIEDFILECACHE_CHK, FALSE, TITLE_MODIFIEDFILECACHE);
+						_r_menu_setitemtext (hsubmenu_region, IDM_WORKINGSET_CHK, FALSE, _r_locale_getstring (IDS_WORKINGSET_CHK));
+						_r_menu_setitemtext (hsubmenu_region, IDM_SYSTEMFILECACHE_CHK, FALSE, _r_locale_getstring (IDS_SYSTEMFILECACHE_CHK));
+						_r_menu_setitemtext (hsubmenu_region, IDM_MODIFIEDFILECACHE_CHK, FALSE, _r_locale_getstring (IDS_MODIFIEDFILECACHE_CHK));
 
-						_r_menu_setitemtext (hsubmenu_region, IDM_MODIFIEDLIST_CHK, FALSE, TITLE_MODIFIEDLIST);
-						_r_menu_setitemtext (hsubmenu_region, IDM_STANDBYLIST_CHK, FALSE, TITLE_STANDBYLIST);
-						_r_menu_setitemtext (hsubmenu_region, IDM_STANDBYLISTPRIORITY0_CHK, FALSE, TITLE_STANDBYLISTPRIORITY0);
-						_r_menu_setitemtext (hsubmenu_region, IDM_REGISTRYCACHE_CHK, FALSE, TITLE_REGISTRYCACHE);
-						_r_menu_setitemtext (hsubmenu_region, IDM_COMBINEMEMORYLISTS_CHK, FALSE, TITLE_COMBINEMEMORYLISTS);
+						_r_menu_setitemtext (hsubmenu_region, IDM_MODIFIEDLIST_CHK, FALSE, _r_locale_getstring (IDS_MODIFIEDLIST_CHK));
+						_r_menu_setitemtext (hsubmenu_region, IDM_STANDBYLIST_CHK, FALSE, _r_locale_getstring (IDS_STANDBYLIST_CHK));
+						_r_menu_setitemtext (hsubmenu_region, IDM_STANDBYLISTPRIORITY0_CHK, FALSE, _r_locale_getstring (IDS_STANDBYLISTPRIORITY0_CHK));
+						_r_menu_setitemtext (hsubmenu_region, IDM_REGISTRYCACHE_CHK, FALSE, _r_locale_getstring (IDS_REGISTRYCACHE_CHK));
+						_r_menu_setitemtext (hsubmenu_region, IDM_COMBINEMEMORYLISTS_CHK, FALSE, _r_locale_getstring (IDS_COMBINEMEMORYLISTS_CHK));
+						_r_menu_setitemtext (hsubmenu_region, IDM_WSL_CACHE_CLEAN_CHK, FALSE, _r_locale_getstring (IDS_WSL_CACHE_CLEAN_CHK));
+						_r_menu_setitemtext (hsubmenu_region, IDM_WSL_MEMORY_RECLAIM_CHK, FALSE, _r_locale_getstring (IDS_WSL_MEMORY_RECLAIM_CHK));
 
 						_r_menu_checkitem (hsubmenu_region, IDM_WORKINGSET_CHK, 0, MF_BYCOMMAND, (mask & REDUCT_WORKING_SET) == REDUCT_WORKING_SET);
 						_r_menu_checkitem (hsubmenu_region, IDM_SYSTEMFILECACHE_CHK, 0, MF_BYCOMMAND, (mask & REDUCT_SYSTEM_FILE_CACHE) == REDUCT_SYSTEM_FILE_CACHE);
@@ -2266,6 +2336,8 @@ INT_PTR CALLBACK DlgProc (
 						_r_menu_checkitem (hsubmenu_region, IDM_MODIFIEDFILECACHE_CHK, 0, MF_BYCOMMAND, (mask & REDUCT_MODIFIED_FILE_CACHE) == REDUCT_MODIFIED_FILE_CACHE);
 						_r_menu_checkitem (hsubmenu_region, IDM_REGISTRYCACHE_CHK, 0, MF_BYCOMMAND, (mask & REDUCT_REGISTRY_CACHE) == REDUCT_REGISTRY_CACHE);
 						_r_menu_checkitem (hsubmenu_region, IDM_COMBINEMEMORYLISTS_CHK, 0, MF_BYCOMMAND, (mask & REDUCT_COMBINE_MEMORY_LISTS) == REDUCT_COMBINE_MEMORY_LISTS);
+						_r_menu_checkitem (hsubmenu_region, IDM_WSL_CACHE_CLEAN_CHK, 0, MF_BYCOMMAND, (mask & REDUCT_WSL_CACHE_CLEAN) == REDUCT_WSL_CACHE_CLEAN);
+						_r_menu_checkitem (hsubmenu_region, IDM_WSL_MEMORY_RECLAIM_CHK, 0, MF_BYCOMMAND, (mask & REDUCT_WSL_MEMORY_RECLAIM) == REDUCT_WSL_MEMORY_RECLAIM);
 
 						if (!_r_sys_iselevated ())
 						{
@@ -2280,6 +2352,8 @@ INT_PTR CALLBACK DlgProc (
 
 							_r_menu_enableitem (hsubmenu_region, IDM_REGISTRYCACHE_CHK, FALSE, FALSE);
 							_r_menu_enableitem (hsubmenu_region, IDM_COMBINEMEMORYLISTS_CHK, FALSE, FALSE);
+							_r_menu_enableitem (hsubmenu_region, IDM_WSL_CACHE_CLEAN_CHK, FALSE, FALSE);
+							_r_menu_enableitem (hsubmenu_region, IDM_WSL_MEMORY_RECLAIM_CHK, FALSE, FALSE);
 						}
 
 						// Flush registry cache (win8.1+)
@@ -2524,15 +2598,27 @@ INT_PTR CALLBACK DlgProc (
 						}
 
 						case IDM_COMBINEMEMORYLISTS_CHK:
-						{
-							new_mask = REDUCT_COMBINE_MEMORY_LISTS;
-							break;
-						}
+					{
+						new_mask = REDUCT_COMBINE_MEMORY_LISTS;
+						break;
+					}
 
-						default:
-						{
-							return FALSE;
-						}
+					case IDM_WSL_CACHE_CLEAN_CHK:
+					{
+						new_mask = REDUCT_WSL_CACHE_CLEAN;
+						break;
+					}
+
+					case IDM_WSL_MEMORY_RECLAIM_CHK:
+					{
+						new_mask = REDUCT_WSL_MEMORY_RECLAIM;
+						break;
+					}
+
+					default:
+					{
+						return FALSE;
+					}
 					}
 
 					if ((ctrl_id == IDM_STANDBYLIST_CHK && !(mask & REDUCT_STANDBY_LIST)) || (ctrl_id == IDM_MODIFIEDLIST_CHK && !(mask & REDUCT_MODIFIED_LIST)))
@@ -2602,18 +2688,30 @@ INT_PTR CALLBACK DlgProc (
 						}
 
 						case IDM_CLEAN_COMBINEMEMORYLISTS:
-						{
-							mask = REDUCT_COMBINE_MEMORY_LISTS;
-							break;
-						}
+			{
+				mask = REDUCT_COMBINE_MEMORY_LISTS;
+				break;
+			}
 
-						default:
-						{
-							return FALSE;
-						}
-					}
+			case IDM_CLEAN_WSL_CACHE:
+			{
+				mask = REDUCT_WSL_CACHE_CLEAN;
+				break;
+			}
 
-					_app_memoryclean (hwnd, SOURCE_CMDLINE, mask);
+			case IDM_CLEAN_WSL_MEMORY:
+			{
+				mask = REDUCT_WSL_MEMORY_RECLAIM;
+				break;
+			}
+
+			default:
+			{
+				return FALSE;
+			}
+		}
+
+		_app_memoryclean (hwnd, SOURCE_CMDLINE, mask);
 
 					break;
 				}

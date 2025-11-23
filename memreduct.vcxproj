@@ -362,6 +362,7 @@
     <ClCompile Include="routine\src\rapp.c" />
     <ClCompile Include="routine\src\routine.c" />
     <ClCompile Include="src\main.c" />
+    <ClCompile Include="src\wsl_helper.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="routine\src\ntapi.h" />

@@ -13,5 +13,3 @@ if exist "D:\softwares\Visual Studio\VC\Auxiliary\Build\vcvars64.bat" (
 
 echo Compiling project...
 msbuild memreduct.sln /p:Configuration=Release /p:Platform=x64
-
-pause
