@@ -10,8 +10,8 @@
 
 STATIC_DATA config = {0};
 
-ULONG limits_arr[13] = {0};
-ULONG intervals_arr[13] = {0};
+ULONG_PTR limits_arr[13] = {0};
+ULONG_PTR intervals_arr[13] = {0};
 
 INT WINAPIV compare_numbers (
 	_In_opt_ PVOID context,
@@ -19,11 +19,11 @@ INT WINAPIV compare_numbers (
 	_In_ LPCVOID ptr2
 )
 {
-	ULONG val1;
-	ULONG val2;
+	ULONG_PTR val1;
+	ULONG_PTR val2;
 
-	val1 = PtrToUlong (ptr1);
-	val2 = PtrToUlong (ptr2);
+	val1 = *(PULONG_PTR)ptr1;
+	val2 = *(PULONG_PTR)ptr2;
 
 	if (val1 < val2)
 		return -1;
@@ -35,7 +35,7 @@ INT WINAPIV compare_numbers (
 }
 
 VOID _app_generate_array (
-	_Out_ _Writable_elements_ (count) PULONG integers,
+	_Out_ _Writable_elements_ (count) PULONG_PTR integers,
 	_In_ ULONG_PTR count,
 	_In_ ULONG_PTR value
 )
@@ -45,19 +45,19 @@ VOID _app_generate_array (
 	ULONG_PTR hash_code;
 	ULONG_PTR index;
 
-	RtlSecureZeroMemory (integers, sizeof (ULONG) * count);
+	RtlSecureZeroMemory (integers, sizeof (ULONG_PTR) * (SIZE_T)count);
 
 	hashtable = _r_obj_createhashtable (sizeof (BOOLEAN), 16, NULL);
 
 	for (index = 1; index < 9; index++)
 	{
-		_r_obj_addhashtableitem (hashtable, index * 10, NULL);
+		_r_obj_addhashtableitem (hashtable, (ULONG)(index * 10), NULL);
 	}
 
 	for (index = value - 2; index <= (value + 2); index++)
 	{
 		if (index >= 5)
-			_r_obj_addhashtableitem (hashtable, index, NULL);
+			_r_obj_addhashtableitem (hashtable, (ULONG)index, NULL);
 	}
 
 	index = 0;
@@ -65,13 +65,13 @@ VOID _app_generate_array (
 	while (_r_obj_enumhashtable (hashtable, NULL, &hash_code, &enum_key))
 	{
 		if (hash_code <= 99)
-			*(PULONG)PTR_ADD_OFFSET (integers, index * sizeof (ULONG)) = (ULONG)hash_code;
+			*(PULONG_PTR)PTR_ADD_OFFSET (integers, index * sizeof (ULONG_PTR)) = (ULONG_PTR)hash_code;
 
 		if (++index >= count)
 			break;
 	}
 
-	qsort_s (integers, count, sizeof (ULONG), &compare_numbers, NULL);
+	qsort_s ((void*)integers, (SIZE_T)count, sizeof (ULONG_PTR), &compare_numbers, NULL);
 
 	_r_obj_dereference (hashtable);
 }
@@ -79,7 +79,7 @@ VOID _app_generate_array (
 VOID _app_generate_menu (
 	_In_ HMENU hsubmenu,
 	_In_ UINT menu_idx,
-	_Out_ _Writable_elements_ (count) PULONG integers,
+	_Out_ _Writable_elements_ (count) PULONG_PTR integers,
 	_In_ ULONG_PTR count,
 	_In_ LPCWSTR format,
 	_In_ LONG_PTR value,
@@ -87,7 +87,7 @@ VOID _app_generate_menu (
 )
 {
 	WCHAR buffer[64];
-	LONG64 menu_value;
+	LONG_PTR menu_value;
 	ULONG menu_items = 0;
 	ULONG menu_id;
 	BOOLEAN is_checked = FALSE;
@@ -2086,13 +2086,17 @@ INT_PTR CALLBACK DlgProc (
 
 					if (GetClientRect (nmlp->hwndFrom, &rect))
 					{
+						POINT pt;
+						
 						ClientToScreen (nmlp->hwndFrom, (PPOINT)&rect);
 
 						_r_wnd_recttorectangle (&rectangle, &rect);
-						_r_wnd_adjustrectangletoworkingarea (&rectangle, nmlp->hwndFrom);
+						_r_wnd_adjustrectangletoworkingarea (nmlp->hwndFrom, &rectangle);
 						_r_wnd_rectangletorect (&rect, &rectangle);
 
-						_r_menu_popup (hsubmenu, hwnd, (PPOINT)&rect, TRUE);
+						pt.x = rect.left;
+						pt.y = rect.top;
+						_r_menu_popup (hsubmenu, hwnd, &pt, TRUE);
 					}
 
 					DestroyMenu (hsubmenu);
@@ -2359,7 +2363,7 @@ INT_PTR CALLBACK DlgProc (
 				idx = (ULONG_PTR)ctrl_id - IDX_TRAY_POPUP_1;
 
 				_r_config_setboolean (L"AutoreductEnable", TRUE, NULL);
-				_r_config_setlong (L"AutoreductValue", limits_arr[idx], NULL);
+			_r_config_setlong (L"AutoreductValue", (LONG)limits_arr[idx], NULL);
 
 				return FALSE;
 			}
@@ -2370,7 +2374,7 @@ INT_PTR CALLBACK DlgProc (
 				idx = (ULONG_PTR)ctrl_id - IDX_TRAY_POPUP_2;
 
 				_r_config_setboolean (L"AutoreductIntervalEnable", TRUE, NULL);
-				_r_config_setlong (L"AutoreductIntervalValue", intervals_arr[idx], NULL);
+			_r_config_setlong (L"AutoreductIntervalValue", (LONG)intervals_arr[idx], NULL);
 
 				return FALSE;
 			}
@@ -2673,7 +2677,7 @@ INT_PTR CALLBACK DlgProc (
 						}
 						else
 						{
-							_r_show_message (hwnd, MB_OK | MB_ICONSTOP, NULL, _r_locale_getstring (IDS_STATUS_NOPRIVILEGES));
+							_r_show_message (hwnd, MB_OK | MB_ICONSTOP, NULL, (LPCWSTR)_r_locale_getstring (IDS_STATUS_NOPRIVILEGES));
 						}
 					}
 
@@ -2719,11 +2723,11 @@ BOOLEAN NTAPI _app_parseargs (
 	{
 		case CmdlineClean:
 		{
-			_r_sys_getopt (_r_sys_getcommandline (), L"clean", &clean_args);
+			_r_sys_getopt ((LPCWSTR)_r_sys_getcommandline ()->buffer, L"clean", &clean_args);
 
 			if (clean_args)
 			{
-				if (_r_str_isequal2 (&clean_args->sr, L"full", TRUE))
+				if (_r_str_isequal2 (&clean_args->sr, (LPWSTR)L"full", TRUE))
 					mask = REDUCT_MASK_ALL;
 
 				_r_obj_dereference (clean_args);
@@ -2744,8 +2748,8 @@ BOOLEAN NTAPI _app_parseargs (
 			_r_show_message (
 				NULL,
 				MB_OK | MB_ICONINFORMATION | MB_TOPMOST,
-				L"Available options for memreduct.exe:",
-				L"-clean - clear default memory regions\r\n" \
+				(LPCWSTR)L"Available options for memreduct.exe:",
+				(LPCWSTR)L"-clean - clear default memory regions\r\n" \
 				L"-clean:full - clear all memory regions"
 			);
 
