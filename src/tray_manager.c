@@ -1,4 +1,5 @@
 #include "tray_manager.h"
+#include "settings_dialog.h"
 
 VOID _app_tray_create (
 	_In_ HWND hwnd

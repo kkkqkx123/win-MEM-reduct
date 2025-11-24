@@ -366,6 +366,12 @@
     <ClCompile Include="src\config_utils.c" />
     <ClCompile Include="src\ui_utils.c" />
     <ClCompile Include="src\icon_manager.c" />
+    <ClCompile Include="src\app_init.c" />
+    <ClCompile Include="src\memory_cleaner.c" />
+    <ClCompile Include="src\tray_manager.c" />
+    <ClCompile Include="src\settings_dialog.c" />
+    <ClCompile Include="src\utils.c" />
+    <ClCompile Include="src\cmdline_parser.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="routine\src\ntapi.h" />
@@ -380,6 +386,11 @@
     <ClInclude Include="src\config_utils.h" />
     <ClInclude Include="src\ui_utils.h" />
     <ClInclude Include="src\icon_manager.h" />
+    <ClInclude Include="src\app_init.h" />
+    <ClInclude Include="src\memory_cleaner.h" />
+    <ClInclude Include="src\tray_manager.h" />
+    <ClInclude Include="src\settings_dialog.h" />
+    <ClInclude Include="src\utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\resource.rc" />

@@ -68,12 +68,6 @@
 #define DEFAULT_DANGER_LEVEL                    90
 #define DEFAULT_WARNING_LEVEL                   60
 
-// Tray colors
-#define TRAY_COLOR_TEXT                         RGB(255, 255, 255)
-#define TRAY_COLOR_BG                           RGB(0, 0, 0)
-#define TRAY_COLOR_WARNING                      RGB(255, 255, 0)
-#define TRAY_COLOR_DANGER                       RGB(255, 0, 0)
-
 // Array sizes
 #define LIMITS_ARRAY_SIZE                       13
 #define INTERVALS_ARRAY_SIZE                  13

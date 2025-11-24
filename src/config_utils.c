@@ -54,7 +54,7 @@ ULONG64 _app_getmemoryinfo (
 	return mem_info->physical_memory.used_bytes;
 }
 
-FORCEINLINE LPCWSTR _app_getcleanupreason (
+LPCWSTR _app_getcleanupreason (
 	_In_ CLEANUP_SOURCE_ENUM src
 )
 {

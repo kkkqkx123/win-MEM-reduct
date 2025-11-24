@@ -5,6 +5,7 @@
 
 #include "routine.h"
 #include "main.h"
+#include "constants.h"
 
 // Configuration management functions
 ULONG _app_getlimitvalue ();

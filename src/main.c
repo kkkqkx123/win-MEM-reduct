@@ -14,6 +14,7 @@
 #include "config_utils.h"
 #include "ui_utils.h"
 #include "cmdline_parser.h"
+#include "tray_manager.h"
 
 STATIC_DATA config = {0};
 
@@ -21,6 +22,30 @@ ULONG_PTR limits_arr[13] = {0};
 ULONG_PTR intervals_arr[13] = {0};
 
 // Configuration utility functions are now in config_utils.c
+
+VOID _app_memoryclean (
+	_In_ HWND hwnd,
+	_In_ CLEANUP_SOURCE_ENUM src,
+	_In_ ULONG mask
+)
+{
+	MEMORY_COMBINE_INFORMATION_EX combine_info_ex = {0};
+	SYSTEM_MEMORY_LIST_COMMAND command;
+	SYSTEM_FILECACHE_INFORMATION sfci = {0};
+	ULONG reduct_before;
+	ULONG reduct_after;
+	WCHAR buffer1[128];
+	WCHAR buffer2[256];
+	NTSTATUS status;
+	ULONG flags;
+	MEMORYSTATUSEX mem_info;
+
+	if (!mask)
+		mask = _app_getcleanupmask ();
+
+	flags = _r_config_getboolean (L"BalloonCleanResults", TRUE, NULL) ? NIIF_INFO : 0;
+
+	mem_info.dwLength = sizeof (mem_info);
 
 	SetCursor (LoadCursorW (NULL, IDC_WAIT));
 
@@ -177,11 +202,17 @@ ULONG_PTR intervals_arr[13] = {0};
 // Icon creation function is now in icon_manager.c
 
 // Timer callback function is now in icon_manager.c
-}
 
 // Icon redraw function is now in icon_manager.c
 
 // Icon initialization function is now in icon_manager.c
+
+INT_PTR CALLBACK SettingsProc (
+	_In_ HWND hwnd,
+	_In_ UINT msg,
+	_In_ WPARAM wparam,
+	_In_ LPARAM lparam
+);
 
 INT_PTR CALLBACK DlgProc (
 	_In_ HWND hwnd,
@@ -525,7 +556,7 @@ INT_PTR CALLBACK DlgProc (
 
 				case WM_CONTEXTMENU:
 				{
-					_app_tray_popup (hwnd);
+					_app_tray_menu_create (hwnd);
 					break;
 				}
 			}
@@ -935,7 +966,56 @@ INT_PTR CALLBACK DlgProc (
 	return FALSE;
 }
 
+// Timer callback function (implementation)
+VOID CALLBACK _app_timercallback (
+	_In_ HWND hwnd,
+	_In_ UINT msg,
+	_In_ UINT_PTR id_event,
+_In_ ULONG time
+)
+{
+	// Timer callback implementation
+	_app_iconredraw (hwnd);
+}
+
 // Command line parsing function is now in cmdline_parser.c
+
+ULONG _app_getcleanupmask ()
+{
+	ULONG mask = 0;
+
+	if (_r_config_getboolean (L"ReductWorkingSet", TRUE, NULL))
+		mask |= REDUCT_WORKING_SET;
+
+	if (_r_config_getboolean (L"ReductSystemFileCache", TRUE, NULL))
+		mask |= REDUCT_SYSTEM_FILE_CACHE;
+
+	if (_r_config_getboolean (L"ReductModifiedList", FALSE, NULL))
+		mask |= REDUCT_MODIFIED_LIST;
+
+	if (_r_config_getboolean (L"ReductStandbyList", FALSE, NULL))
+		mask |= REDUCT_STANDBY_LIST;
+
+	if (_r_config_getboolean (L"ReductStandbyPriority0List", TRUE, NULL))
+		mask |= REDUCT_STANDBY_PRIORITY0_LIST;
+
+	if (_r_config_getboolean (L"ReductRegistryCache", TRUE, NULL))
+		mask |= REDUCT_REGISTRY_CACHE;
+
+	if (_r_config_getboolean (L"ReductCombineMemoryLists", TRUE, NULL))
+		mask |= REDUCT_COMBINE_MEMORY_LISTS;
+
+	if (_r_config_getboolean (L"ReductModifiedFileCache", TRUE, NULL))
+		mask |= REDUCT_MODIFIED_FILE_CACHE;
+
+	if (_r_config_getboolean (L"ReductWslCacheClean", FALSE, NULL))
+		mask |= REDUCT_WSL_CACHE_CLEAN;
+
+	if (_r_config_getboolean (L"ReductWslMemoryReclaim", FALSE, NULL))
+		mask |= REDUCT_WSL_MEMORY_RECLAIM;
+
+	return mask;
+}
 
 INT APIENTRY wWinMain (
 	_In_ HINSTANCE hinst,

@@ -17,3 +17,6 @@ VOID _app_generate_menu (
 	_In_ ULONG_PTR selected_value,
 	_In_ BOOLEAN is_enabled
 );
+
+// Alias for _r_menu_clearitems
+#define _r_menu_clear(hmenu) _r_menu_clearitems(hmenu)
