@@ -971,11 +971,91 @@ VOID CALLBACK _app_timercallback (
 	_In_ HWND hwnd,
 	_In_ UINT msg,
 	_In_ UINT_PTR id_event,
-_In_ ULONG time
+	_In_ ULONG time
 )
 {
-	// Timer callback implementation
-	_app_iconredraw (hwnd);
+	R_MEMORY_INFO mem_info;
+	ULONG percent;
+	HICON hicon = NULL;
+	WCHAR buffer[128];
+
+	_app_getmemoryinfo (&mem_info);
+
+	// check previous percent to prevent icon redraw
+	if (!config.ms_prev || config.ms_prev != mem_info.physical_memory.percent)
+	{
+		config.ms_prev = mem_info.physical_memory.percent; // store last percentage value (required!)
+
+		hicon = _app_iconcreate (config.ms_prev);
+	}
+
+	_r_tray_setinfoformat (
+		hwnd,
+		&GUID_TrayIcon,
+		hicon,
+		L"%s: %" TEXT (PR_DOUBLE) L"%%\r\n%s: %" TEXT (PR_DOUBLE) L"%%\r\n%s: %" TEXT (PR_DOUBLE) L"%%",
+		_r_locale_getstring (IDS_GROUP_1),
+		mem_info.physical_memory.percent_f,
+		_r_locale_getstring (IDS_GROUP_2),
+		mem_info.page_file.percent_f,
+		_r_locale_getstring (IDS_GROUP_3),
+		mem_info.system_cache.percent_f
+	);
+
+	if (!_r_wnd_isvisible (hwnd, FALSE))
+		return;
+
+	// set item lparam information
+	for (INT i = 0; i < _r_listview_getitemcount (hwnd, IDC_LISTVIEW); i++)
+	{
+		if (i < 3)
+		{
+			percent = mem_info.physical_memory.percent;
+		}
+		else if (i < 6)
+		{
+			percent = mem_info.page_file.percent;
+		}
+		else if (i < 9)
+		{
+			percent = mem_info.system_cache.percent;
+		}
+
+		_r_listview_setitem (hwnd, IDC_LISTVIEW, i, 0, NULL, I_DEFAULT, I_DEFAULT, (LPARAM)percent);
+	}
+
+	// physical memory
+	_r_str_printf (buffer, RTL_NUMBER_OF (buffer), L"%" TEXT (PR_DOUBLE) L"%%", mem_info.physical_memory.percent_f);
+	_r_listview_setitem (hwnd, IDC_LISTVIEW, 0, 1, buffer, I_DEFAULT, I_DEFAULT, I_DEFAULT);
+
+	_r_format_bytesize64 (buffer, RTL_NUMBER_OF (buffer), mem_info.physical_memory.free_bytes);
+	_r_listview_setitem (hwnd, IDC_LISTVIEW, 1, 1, buffer, I_DEFAULT, I_DEFAULT, I_DEFAULT);
+
+	_r_format_bytesize64 (buffer, RTL_NUMBER_OF (buffer), mem_info.physical_memory.total_bytes);
+	_r_listview_setitem (hwnd, IDC_LISTVIEW, 2, 1, buffer, I_DEFAULT, I_DEFAULT, I_DEFAULT);
+
+	// virtual memory
+	_r_str_printf (buffer, RTL_NUMBER_OF (buffer), L"%" TEXT (PR_DOUBLE) L"%%", mem_info.page_file.percent_f);
+	_r_listview_setitem (hwnd, IDC_LISTVIEW, 3, 1, buffer, I_DEFAULT, I_DEFAULT, I_DEFAULT);
+
+	_r_format_bytesize64 (buffer, RTL_NUMBER_OF (buffer), mem_info.page_file.free_bytes);
+	_r_listview_setitem (hwnd, IDC_LISTVIEW, 4, 1, buffer, I_DEFAULT, I_DEFAULT, I_DEFAULT);
+
+	_r_format_bytesize64 (buffer, RTL_NUMBER_OF (buffer), mem_info.page_file.total_bytes);
+	_r_listview_setitem (hwnd, IDC_LISTVIEW, 5, 1, buffer, I_DEFAULT, I_DEFAULT, I_DEFAULT);
+
+	// system cache
+	_r_str_printf (buffer, RTL_NUMBER_OF (buffer), L"%" TEXT (PR_DOUBLE) L"%%", mem_info.system_cache.percent_f);
+	_r_listview_setitem (hwnd, IDC_LISTVIEW, 6, 1, buffer, I_DEFAULT, I_DEFAULT, I_DEFAULT);
+
+	_r_format_bytesize64 (buffer, RTL_NUMBER_OF (buffer), mem_info.system_cache.free_bytes);
+	_r_listview_setitem (hwnd, IDC_LISTVIEW, 7, 1, buffer, I_DEFAULT, I_DEFAULT, I_DEFAULT);
+
+	_r_format_bytesize64 (buffer, RTL_NUMBER_OF (buffer), mem_info.system_cache.total_bytes);
+	_r_listview_setitem (hwnd, IDC_LISTVIEW, 8, 1, buffer, I_DEFAULT, I_DEFAULT, I_DEFAULT);
+
+	if (_r_wnd_isvisible (hwnd, FALSE))
+		_r_listview_redraw (hwnd, IDC_LISTVIEW);
 }
 
 // Command line parsing function is now in cmdline_parser.c

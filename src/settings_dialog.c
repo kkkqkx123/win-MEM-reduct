@@ -54,7 +54,7 @@ INT_PTR CALLBACK SettingsProc (
 					_r_listview_additem (hwnd, IDC_REGIONS, 6, _r_locale_getstring (IDS_REGISTRYCACHE_CHK), I_DEFAULT, I_DEFAULT, REDUCT_REGISTRY_CACHE);
 					_r_listview_additem (hwnd, IDC_REGIONS, 7, _r_locale_getstring (IDS_COMBINEMEMORYLISTS_CHK), I_DEFAULT, I_DEFAULT, REDUCT_COMBINE_MEMORY_LISTS);
 
-					_r_listview_setcolumn (hwnd, IDC_REGIONS, 0, NULL, -100);
+					_r_listview_setcolumn (hwnd, IDC_REGIONS, 0, NULL, 200);
 
 					mask = _r_config_getulong (L"ReductMask2", REDUCT_MASK_DEFAULT, NULL);
 
@@ -233,6 +233,16 @@ INT_PTR CALLBACK SettingsProc (
 					_r_ctrl_setstring (hwnd, IDC_AUTOREDUCTINTERVALENABLE_CHK, _r_locale_getstring (IDS_AUTOREDUCTINTERVALENABLE_CHK));
 
 					_r_ctrl_setstring (hwnd, IDC_HOTKEY_CLEAN_CHK, _r_locale_getstring (IDS_HOTKEY_CLEAN_CHK));
+
+					// 重新本地化内存清理配置项列表
+					_r_listview_setitem (hwnd, IDC_REGIONS, 0, 0, _r_locale_getstring (IDS_WORKINGSET_CHK), I_DEFAULT, I_DEFAULT, I_DEFAULT);
+					_r_listview_setitem (hwnd, IDC_REGIONS, 1, 0, _r_locale_getstring (IDS_SYSTEMFILECACHE_CHK), I_DEFAULT, I_DEFAULT, I_DEFAULT);
+					_r_listview_setitem (hwnd, IDC_REGIONS, 2, 0, _r_locale_getstring (IDS_MODIFIEDLIST_CHK), I_DEFAULT, I_DEFAULT, I_DEFAULT);
+					_r_listview_setitem (hwnd, IDC_REGIONS, 3, 0, _r_locale_getstring (IDS_STANDBYLIST_CHK), I_DEFAULT, I_DEFAULT, I_DEFAULT);
+					_r_listview_setitem (hwnd, IDC_REGIONS, 4, 0, _r_locale_getstring (IDS_STANDBYLISTPRIORITY0_CHK), I_DEFAULT, I_DEFAULT, I_DEFAULT);
+					_r_listview_setitem (hwnd, IDC_REGIONS, 5, 0, _r_locale_getstring (IDS_MODIFIEDFILECACHE_CHK), I_DEFAULT, I_DEFAULT, I_DEFAULT);
+					_r_listview_setitem (hwnd, IDC_REGIONS, 6, 0, _r_locale_getstring (IDS_REGISTRYCACHE_CHK), I_DEFAULT, I_DEFAULT, I_DEFAULT);
+					_r_listview_setitem (hwnd, IDC_REGIONS, 7, 0, _r_locale_getstring (IDS_COMBINEMEMORYLISTS_CHK), I_DEFAULT, I_DEFAULT, I_DEFAULT);
 
 					break;
 				}

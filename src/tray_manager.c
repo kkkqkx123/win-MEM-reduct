@@ -28,8 +28,34 @@ VOID _app_tray_menu_create (
 	_In_ HWND hwnd
 )
 {
-	// This function is called from WM_CONTEXTMENU handler
-	// The actual menu creation logic is in the WM_CONTEXTMENU case
+	HMENU hmenu;
+	HMENU htraymenu;
+	POINT pt;
+
+	// Load the tray menu resource
+	hmenu = LoadMenu (_r_sys_getimagebase (), MAKEINTRESOURCE (IDM_TRAY));
+	if (!hmenu)
+		return;
+
+	// Get the submenu (first popup)
+	htraymenu = GetSubMenu (hmenu, 0);
+	if (!htraymenu)
+	{
+		DestroyMenu (hmenu);
+		return;
+	}
+
+	// Get current cursor position for menu display
+	GetCursorPos (&pt);
+
+	// Set foreground window to ensure proper menu behavior
+	SetForegroundWindow (hwnd);
+
+	// Display the tray menu
+	TrackPopupMenu (htraymenu, TPM_RIGHTBUTTON | TPM_BOTTOMALIGN, pt.x, pt.y, 0, hwnd, NULL);
+
+	// Destroy the menu
+	DestroyMenu (hmenu);
 }
 
 VOID _app_tray_menu_handle (
