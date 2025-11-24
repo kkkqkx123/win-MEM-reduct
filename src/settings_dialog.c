@@ -53,6 +53,8 @@ INT_PTR CALLBACK SettingsProc (
 					_r_listview_additem (hwnd, IDC_REGIONS, 5, _r_locale_getstring (IDS_MODIFIEDFILECACHE_CHK), I_DEFAULT, I_DEFAULT, REDUCT_MODIFIED_FILE_CACHE);
 					_r_listview_additem (hwnd, IDC_REGIONS, 6, _r_locale_getstring (IDS_REGISTRYCACHE_CHK), I_DEFAULT, I_DEFAULT, REDUCT_REGISTRY_CACHE);
 					_r_listview_additem (hwnd, IDC_REGIONS, 7, _r_locale_getstring (IDS_COMBINEMEMORYLISTS_CHK), I_DEFAULT, I_DEFAULT, REDUCT_COMBINE_MEMORY_LISTS);
+					_r_listview_additem (hwnd, IDC_REGIONS, 8, _r_locale_getstring (IDS_WSL_CACHE_CLEAN_CHK), I_DEFAULT, I_DEFAULT, REDUCT_WSL_CACHE_CLEAN);
+					_r_listview_additem (hwnd, IDC_REGIONS, 9, _r_locale_getstring (IDS_WSL_MEMORY_RECLAIM_CHK), I_DEFAULT, I_DEFAULT, REDUCT_WSL_MEMORY_RECLAIM);
 
 					_r_listview_setcolumn (hwnd, IDC_REGIONS, 0, NULL, 200);
 
@@ -66,6 +68,8 @@ INT_PTR CALLBACK SettingsProc (
 					_r_listview_setitemcheck (hwnd, IDC_REGIONS, 5, (mask & REDUCT_MODIFIED_FILE_CACHE) == REDUCT_MODIFIED_FILE_CACHE);
 					_r_listview_setitemcheck (hwnd, IDC_REGIONS, 6, (mask & REDUCT_REGISTRY_CACHE) == REDUCT_REGISTRY_CACHE);
 					_r_listview_setitemcheck (hwnd, IDC_REGIONS, 7, (mask & REDUCT_COMBINE_MEMORY_LISTS) == REDUCT_COMBINE_MEMORY_LISTS);
+					_r_listview_setitemcheck (hwnd, IDC_REGIONS, 8, (mask & REDUCT_WSL_CACHE_CLEAN) == REDUCT_WSL_CACHE_CLEAN);
+					_r_listview_setitemcheck (hwnd, IDC_REGIONS, 9, (mask & REDUCT_WSL_MEMORY_RECLAIM) == REDUCT_WSL_MEMORY_RECLAIM);
 
 					_r_wnd_removecontext (hwnd, IDC_REGIONS);
 
@@ -243,6 +247,8 @@ INT_PTR CALLBACK SettingsProc (
 					_r_listview_setitem (hwnd, IDC_REGIONS, 5, 0, _r_locale_getstring (IDS_MODIFIEDFILECACHE_CHK), I_DEFAULT, I_DEFAULT, I_DEFAULT);
 					_r_listview_setitem (hwnd, IDC_REGIONS, 6, 0, _r_locale_getstring (IDS_REGISTRYCACHE_CHK), I_DEFAULT, I_DEFAULT, I_DEFAULT);
 					_r_listview_setitem (hwnd, IDC_REGIONS, 7, 0, _r_locale_getstring (IDS_COMBINEMEMORYLISTS_CHK), I_DEFAULT, I_DEFAULT, I_DEFAULT);
+					_r_listview_setitem (hwnd, IDC_REGIONS, 8, 0, _r_locale_getstring (IDS_WSL_CACHE_CLEAN_CHK), I_DEFAULT, I_DEFAULT, I_DEFAULT);
+					_r_listview_setitem (hwnd, IDC_REGIONS, 9, 0, _r_locale_getstring (IDS_WSL_MEMORY_RECLAIM_CHK), I_DEFAULT, I_DEFAULT, I_DEFAULT);
 
 					break;
 				}

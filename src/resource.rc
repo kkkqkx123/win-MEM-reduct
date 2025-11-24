@@ -336,6 +336,8 @@ STRINGTABLE
 	IDS_MODIFIEDFILECACHE_CHK "Modified file cache"
 	IDS_REGISTRYCACHE_CHK "Registry cache"
 	IDS_COMBINEMEMORYLISTS_CHK "Combine memory lists"
+	IDS_WSL_CACHE_CLEAN_CHK "WSL cache clean"
+	IDS_WSL_MEMORY_RECLAIM_CHK "WSL memory reclaim"
 }
 
 //
