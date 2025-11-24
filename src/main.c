@@ -50,7 +50,7 @@ VOID _app_memoryclean (
 	SetCursor (LoadCursorW (NULL, IDC_WAIT));
 
 	// difference (before)
-	reduct_before = _app_getmemoryinfo (&mem_info);
+	reduct_before = (ULONG)_app_getmemoryinfo ((PR_MEMORY_INFO)&mem_info);
 
 	// Working set (vista+)
 	if ((mask & REDUCT_WORKING_SET) == REDUCT_WORKING_SET)
@@ -163,7 +163,7 @@ VOID _app_memoryclean (
 	SetCursor (LoadCursorW (NULL, IDC_ARROW));
 
 	// difference (after)
-	reduct_after = _app_getmemoryinfo (&mem_info);
+	reduct_after = (ULONG)_app_getmemoryinfo ((PR_MEMORY_INFO)&mem_info);
 
 	if (reduct_after < reduct_before)
 	{

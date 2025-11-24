@@ -3,7 +3,7 @@
 
 #include "ui_utils.h"
 
-INT WINAPIV compare_numbers (
+INT CALLBACK compare_numbers (
 	_In_opt_ PVOID context,
 	_In_ LPCVOID ptr1,
 	_In_ LPCVOID ptr2
@@ -68,11 +68,11 @@ VOID _app_generate_array (
 
 VOID _app_generate_menu (
 	_In_ HMENU hsubmenu,
-	_In_ UINT menu_idx,
-	_Out_ _Writable_elements_ (count) PULONG_PTR integers,
-	_In_ ULONG_PTR count,
+	_In_ INT start_id,
+	_In_ ULONG_PTR* ptr_arr,
+	_In_ ULONG items_count,
 	_In_ LPCWSTR format,
-	_In_ LONG_PTR value,
+	_In_ ULONG_PTR selected_value,
 	_In_ BOOLEAN is_enabled
 )
 {
@@ -84,16 +84,16 @@ VOID _app_generate_menu (
 
 	_r_menu_setitemtext (hsubmenu, 0, TRUE, _r_locale_getstring (IDS_TRAY_DISABLE));
 
-	_app_generate_array (integers, count, value);
+	_app_generate_array (ptr_arr, items_count, selected_value);
 
-	for (UINT i = 0; i < count; i++)
+	for (UINT i = 0; i < items_count; i++)
 	{
-		menu_value = integers[i];
+		menu_value = ptr_arr[i];
 
 		if (!menu_value)
 			continue;
 
-		menu_id = menu_idx + i;
+		menu_id = start_id + i;
 
 		_r_str_printf (buffer, RTL_NUMBER_OF (buffer), format, menu_value);
 
@@ -102,7 +102,7 @@ VOID _app_generate_menu (
 		if (!_r_sys_iselevated ())
 			_r_menu_enableitem (hsubmenu, menu_id, FALSE, FALSE);
 
-		if (value == menu_value)
+		if (selected_value == menu_value)
 		{
 			_r_menu_checkitem (hsubmenu, menu_id, menu_id, MF_BYCOMMAND, menu_id);
 

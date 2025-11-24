@@ -7,7 +7,7 @@
 #include "main.h"
 
 // Array generation and sorting
-INT WINAPIV compare_numbers (
+INT CALLBACK compare_numbers (
 	_In_opt_ PVOID context,
 	_In_ LPCVOID ptr1,
 	_In_ LPCVOID ptr2
@@ -22,11 +22,11 @@ VOID _app_generate_array (
 // Menu generation
 VOID _app_generate_menu (
 	_In_ HMENU hsubmenu,
-	_In_ UINT menu_idx,
-	_Out_ _Writable_elements_ (count) PULONG_PTR integers,
-	_In_ ULONG_PTR count,
+	_In_ INT start_id,
+	_In_ ULONG_PTR* ptr_arr,
+	_In_ ULONG items_count,
 	_In_ LPCWSTR format,
-	_In_ LONG_PTR value,
+	_In_ ULONG_PTR selected_value,
 	_In_ BOOLEAN is_enabled
 );
 
