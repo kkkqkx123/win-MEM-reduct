@@ -281,6 +281,13 @@
 #define IDM_CLEAN_WSL_CACHE 201
 #define IDM_CLEAN_WSL_MEMORY 202
 
+// Tray menu strings
+#define IDS_TRAY_CLEAN 203
+#define IDS_TRAY_SETTINGS 204
+#define IDS_TRAY_WEBSITE 205
+#define IDS_TRAY_ABOUT 206
+#define IDS_TRAY_EXIT 207
+
 // Icons
 #define IDI_MAIN 100
 

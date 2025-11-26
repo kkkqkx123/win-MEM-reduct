@@ -4652,6 +4652,22 @@ BOOL CALLBACK _r_theme_enumchildwindows (
 	}
 	else if (_r_str_isequal2 (&class_name->sr, WC_COMBOBOX, TRUE))
 	{
+		// 为组合框设置正确的字体，避免文本显示为方框
+		HFONT hParentFont = (HFONT)SendMessageW (GetParent (hwnd), WM_GETFONT, 0, 0);
+		if (hParentFont)
+		{
+			SendMessageW (hwnd, WM_SETFONT, (WPARAM)hParentFont, TRUE);
+		}
+		else
+		{
+			// 如果父窗口没有字体，使用系统默认字体
+			HFONT hDefaultFont = (HFONT)GetStockObject (DEFAULT_GUI_FONT);
+			if (hDefaultFont)
+			{
+				SendMessageW (hwnd, WM_SETFONT, (WPARAM)hDefaultFont, TRUE);
+			}
+		}
+
 		if (_r_sys_isosversiongreaterorequal (WINDOWS_10_RS5))
 		{
 			style = _r_wnd_getstyle (hwnd, GWL_STYLE);

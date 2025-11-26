@@ -229,6 +229,12 @@ INT_PTR CALLBACK DlgProc (
 
 			_app_initialize (hwnd);
 
+			// 初始化全局数组，用于托盘菜单事件处理
+			_app_generate_array (limits_arr, RTL_NUMBER_OF (limits_arr), 
+				_r_config_getlong (L"AutoreductValue", DEFAULT_AUTOREDUCT_VAL, NULL));
+			_app_generate_array (intervals_arr, RTL_NUMBER_OF (intervals_arr), 
+				_r_config_getlong (L"AutoreductIntervalValue", DEFAULT_AUTOREDUCTINTERVAL_VAL, NULL));
+
 			SetTimer (hwnd, UID, TIMER, &_app_timercallback);
 
 			break;
@@ -346,6 +352,10 @@ INT_PTR CALLBACK DlgProc (
 			// enum localizations
 			if (hmenu)
 				_r_locale_enum (GetSubMenu (hmenu, LANG_SUBMENU), LANG_MENU, IDX_LANGUAGE);
+
+			// localize tray menu
+			// Note: Tray menu is loaded dynamically, we need to update its strings when it's created
+			// The tray menu strings are set in the tray menu creation function
 
 			break;
 		}

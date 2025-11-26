@@ -30,6 +30,7 @@ VOID _app_tray_menu_create (
 {
 	HMENU hmenu;
 	HMENU htraymenu;
+	HMENU hsubmenu;
 	POINT pt;
 
 	// Load the tray menu resource
@@ -43,6 +44,58 @@ VOID _app_tray_menu_create (
 	{
 		DestroyMenu (hmenu);
 		return;
+	}
+
+	// Localize tray menu items
+	_r_menu_setitemtext (htraymenu, IDM_TRAY_SHOW, FALSE, _r_locale_getstring (IDS_TRAY_SHOW));
+	_r_menu_setitemtext (htraymenu, IDM_TRAY_CLEAN, FALSE, _r_locale_getstring (IDS_TRAY_CLEAN));
+	_r_menu_setitemtext (htraymenu, IDM_TRAY_SETTINGS, FALSE, _r_locale_getstring (IDS_TRAY_SETTINGS));
+	_r_menu_setitemtext (htraymenu, IDM_TRAY_WEBSITE, FALSE, _r_locale_getstring (IDS_TRAY_WEBSITE));
+	_r_menu_setitemtext (htraymenu, IDM_TRAY_ABOUT, FALSE, _r_locale_getstring (IDS_TRAY_ABOUT));
+	_r_menu_setitemtext (htraymenu, IDM_TRAY_EXIT, FALSE, _r_locale_getstring (IDS_TRAY_EXIT));
+
+	// Localize memory cleaning submenu
+	hsubmenu = GetSubMenu (htraymenu, 0); // First popup submenu (memory cleaning)
+	if (hsubmenu)
+	{
+		_r_menu_setitemtext (hsubmenu, 0, TRUE, _r_locale_getstring (IDS_TRAY_POPUP_1)); // Set popup title
+		
+		// Set memory cleaning items
+		_r_menu_setitemtext (hsubmenu, IDM_WORKINGSET_CHK, FALSE, _r_locale_getstring (IDS_WORKINGSET_CHK));
+		_r_menu_setitemtext (hsubmenu, IDM_SYSTEMFILECACHE_CHK, FALSE, _r_locale_getstring (IDS_SYSTEMFILECACHE_CHK));
+		_r_menu_setitemtext (hsubmenu, IDM_MODIFIEDFILECACHE_CHK, FALSE, _r_locale_getstring (IDS_MODIFIEDFILECACHE_CHK));
+		_r_menu_setitemtext (hsubmenu, IDM_STANDBYLISTPRIORITY0_CHK, FALSE, _r_locale_getstring (IDS_STANDBYLISTPRIORITY0_CHK));
+		_r_menu_setitemtext (hsubmenu, IDM_STANDBYLIST_CHK, FALSE, _r_locale_getstring (IDS_STANDBYLIST_CHK));
+		_r_menu_setitemtext (hsubmenu, IDM_MODIFIEDLIST_CHK, FALSE, _r_locale_getstring (IDS_MODIFIEDLIST_CHK));
+		_r_menu_setitemtext (hsubmenu, IDM_REGISTRYCACHE_CHK, FALSE, _r_locale_getstring (IDS_REGISTRYCACHE_CHK));
+		_r_menu_setitemtext (hsubmenu, IDM_COMBINEMEMORYLISTS_CHK, FALSE, _r_locale_getstring (IDS_COMBINEMEMORYLISTS_CHK));
+		_r_menu_setitemtext (hsubmenu, IDM_WSL_CACHE_CLEAN_CHK, FALSE, _r_locale_getstring (IDS_WSL_CACHE_CLEAN_CHK));
+		_r_menu_setitemtext (hsubmenu, IDM_WSL_MEMORY_RECLAIM_CHK, FALSE, _r_locale_getstring (IDS_WSL_MEMORY_RECLAIM_CHK));
+	}
+
+	// Localize and generate autoreduct submenus
+	hsubmenu = GetSubMenu (htraymenu, 1); // Second popup submenu (autoreduct disable)
+	if (hsubmenu)
+	{
+		// 生成自动清理间隔时间菜单项
+		ULONG_PTR local_limits_arr[LIMITS_ARRAY_SIZE] = {0};
+		_app_generate_array (local_limits_arr, RTL_NUMBER_OF (local_limits_arr), _r_config_getlong (L"AutoreductValue", DEFAULT_AUTOREDUCT_VAL, NULL));
+		_r_menu_setitemtext (hsubmenu, 0, TRUE, _r_locale_getstring (IDS_TRAY_DISABLE));
+		// 使用局部数组并生成菜单项
+		_app_generate_menu (hsubmenu, IDX_TRAY_POPUP_1, local_limits_arr, RTL_NUMBER_OF (local_limits_arr), L"%lu%%", 
+			_r_config_getlong (L"AutoreductValue", DEFAULT_AUTOREDUCT_VAL, NULL), _r_config_getboolean (L"AutoreductEnable", FALSE, NULL));
+	}
+
+	hsubmenu = GetSubMenu (htraymenu, 2); // Third popup submenu (interval disable)
+	if (hsubmenu)
+	{
+		// 生成自动清理时间间隔菜单项
+		ULONG_PTR local_intervals_arr[INTERVALS_ARRAY_SIZE] = {0};
+		_app_generate_array (local_intervals_arr, RTL_NUMBER_OF (local_intervals_arr), _r_config_getlong (L"AutoreductIntervalValue", DEFAULT_AUTOREDUCTINTERVAL_VAL, NULL));
+		_r_menu_setitemtext (hsubmenu, 0, TRUE, _r_locale_getstring (IDS_TRAY_DISABLE));
+		// 使用局部数组并生成菜单项
+		_app_generate_menu (hsubmenu, IDX_TRAY_POPUP_2, local_intervals_arr, RTL_NUMBER_OF (local_intervals_arr), L"%lu min", 
+			_r_config_getlong (L"AutoreductIntervalValue", DEFAULT_AUTOREDUCTINTERVAL_VAL, NULL), _r_config_getboolean (L"AutoreductIntervalEnable", FALSE, NULL));
 	}
 
 	// Get current cursor position for menu display

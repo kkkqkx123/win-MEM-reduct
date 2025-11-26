@@ -338,6 +338,12 @@ STRINGTABLE
 	IDS_COMBINEMEMORYLISTS_CHK "Combine memory lists"
 	IDS_WSL_CACHE_CLEAN_CHK "WSL cache clean"
 	IDS_WSL_MEMORY_RECLAIM_CHK "WSL memory reclaim"
+
+	IDS_TRAY_CLEAN "Clean memory"
+	IDS_TRAY_SETTINGS "Settings..."
+	IDS_TRAY_WEBSITE "Website"
+	IDS_TRAY_ABOUT "About"
+	IDS_TRAY_EXIT "Exit"
 }
 
 //

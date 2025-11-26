@@ -39,19 +39,22 @@ VOID _app_generate_array (
 
 	hashtable = _r_obj_createhashtable (sizeof (BOOLEAN), 16, NULL);
 
+	// 添加10的倍数（10, 20, 30, ..., 80）
 	for (index = 1; index < 9; index++)
 	{
 		_r_obj_addhashtableitem (hashtable, (ULONG)(index * 10), NULL);
 	}
 
+	// 添加selected_value附近的值（如果>=0）
 	for (index = value - 2; index <= (value + 2); index++)
 	{
-		if (index >= 5)
+		if (index >= 0) // 修复：允许添加0值
 			_r_obj_addhashtableitem (hashtable, (ULONG)index, NULL);
 	}
 
 	index = 0;
 
+	// 从哈希表中获取值填充数组
 	while (_r_obj_enumhashtable (hashtable, NULL, &hash_code, (PULONG_PTR)&enum_key))
 	{
 		if (hash_code <= 99)
@@ -59,6 +62,16 @@ VOID _app_generate_array (
 
 		if (++index >= count)
 			break;
+	}
+
+	// 确保数组中没有空值，如果有则填充合理的值
+	if (index < count)
+	{
+		for (ULONG_PTR i = index; i < count; i++)
+		{
+			// 填充递增的值，确保不会有空值
+			integers[i] = (i + 1) * 5;
+		}
 	}
 
 	qsort_s ((void*)integers, (SIZE_T)count, sizeof (ULONG_PTR), &compare_numbers, NULL);
@@ -90,12 +103,14 @@ VOID _app_generate_menu (
 	{
 		menu_value = ptr_arr[i];
 
-		if (!menu_value)
-			continue;
+		// 修复：允许0值显示，避免菜单项空白
+		// if (!menu_value)
+		//	continue;
 
 		menu_id = start_id + i;
 
-		_r_str_printf (buffer, RTL_NUMBER_OF (buffer), format, menu_value);
+		// 修复字符格式化问题：使用%lu替代%I64u，确保字符正确显示
+		_r_str_printf (buffer, RTL_NUMBER_OF (buffer), format, (ULONG)menu_value);
 
 		_r_menu_additem (hsubmenu, menu_id, buffer);
 
