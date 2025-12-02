@@ -95,22 +95,22 @@ VOID _app_generate_menu (
 	ULONG menu_id;
 	BOOLEAN is_checked = FALSE;
 
-	_r_menu_setitemtext (hsubmenu, 0, TRUE, _r_locale_getstring (IDS_TRAY_DISABLE));
-
 	_app_generate_array (ptr_arr, items_count, selected_value);
 
 	for (UINT i = 0; i < items_count; i++)
 	{
 		menu_value = ptr_arr[i];
 
-		// 修复：允许0值显示，避免菜单项空白
-		// if (!menu_value)
-		//	continue;
+		// 修复：允许0值显示，因为清理界限和间隔可能设置为0
+		// 但仍然跳过无效的负值
+		if (menu_value < 0)
+			continue;
 
 		menu_id = start_id + i;
 
-		// 修复字符格式化问题：使用%lu替代%I64u，确保字符正确显示
-		_r_str_printf (buffer, RTL_NUMBER_OF (buffer), format, (ULONG)menu_value);
+		// 修复字符格式化问题：使用宽字符格式字符串和正确的类型转换
+		// 直接使用menu_value参数，确保格式字符串与参数类型匹配
+		_r_str_printf (buffer, RTL_NUMBER_OF (buffer), format, (ULONG_PTR)menu_value);
 
 		_r_menu_additem (hsubmenu, menu_id, buffer);
 

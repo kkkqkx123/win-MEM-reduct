@@ -54,11 +54,12 @@ VOID _app_tray_menu_create (
 	_r_menu_setitemtext (htraymenu, IDM_TRAY_ABOUT, FALSE, _r_locale_getstring (IDS_TRAY_ABOUT));
 	_r_menu_setitemtext (htraymenu, IDM_TRAY_EXIT, FALSE, _r_locale_getstring (IDS_TRAY_EXIT));
 
-	// Localize memory cleaning submenu
+	// Localize and generate memory cleaning submenus
 	hsubmenu = GetSubMenu (htraymenu, 0); // First popup submenu (memory cleaning)
 	if (hsubmenu)
 	{
-		_r_menu_setitemtext (hsubmenu, 0, TRUE, _r_locale_getstring (IDS_TRAY_POPUP_1)); // Set popup title
+		// 修复：通过父菜单设置第一个POPUP子菜单的标题（索引0：第一个POPUP子菜单在父菜单中的位置）
+		_r_menu_setitemtext (htraymenu, 0, TRUE, _r_locale_getstring (IDS_TRAY_POPUP_1)); // 清理区域
 		
 		// Set memory cleaning items
 		_r_menu_setitemtext (hsubmenu, IDM_WORKINGSET_CHK, FALSE, _r_locale_getstring (IDS_WORKINGSET_CHK));
@@ -77,10 +78,11 @@ VOID _app_tray_menu_create (
 	hsubmenu = GetSubMenu (htraymenu, 1); // Second popup submenu (autoreduct disable)
 	if (hsubmenu)
 	{
+		// 修复：通过父菜单设置第二个POPUP子菜单的标题（索引1：第二个POPUP子菜单在父菜单中的位置）
+		_r_menu_setitemtext (htraymenu, 1, TRUE, _r_locale_getstring (IDS_TRAY_POPUP_2)); // 清理界限
 		// 生成自动清理间隔时间菜单项
 		ULONG_PTR local_limits_arr[LIMITS_ARRAY_SIZE] = {0};
 		_app_generate_array (local_limits_arr, RTL_NUMBER_OF (local_limits_arr), _r_config_getlong (L"AutoreductValue", DEFAULT_AUTOREDUCT_VAL, NULL));
-		_r_menu_setitemtext (hsubmenu, 0, TRUE, _r_locale_getstring (IDS_TRAY_DISABLE));
 		// 使用局部数组并生成菜单项
 		_app_generate_menu (hsubmenu, IDX_TRAY_POPUP_1, local_limits_arr, RTL_NUMBER_OF (local_limits_arr), L"%lu%%", 
 			_r_config_getlong (L"AutoreductValue", DEFAULT_AUTOREDUCT_VAL, NULL), _r_config_getboolean (L"AutoreductEnable", FALSE, NULL));
@@ -89,13 +91,29 @@ VOID _app_tray_menu_create (
 	hsubmenu = GetSubMenu (htraymenu, 2); // Third popup submenu (interval disable)
 	if (hsubmenu)
 	{
+		// 修复：通过父菜单设置第三个POPUP子菜单的标题（索引2：第三个POPUP子菜单在父菜单中的位置）
+		_r_menu_setitemtext (htraymenu, 2, TRUE, _r_locale_getstring (IDS_TRAY_POPUP_3)); // 清理间隔
 		// 生成自动清理时间间隔菜单项
 		ULONG_PTR local_intervals_arr[INTERVALS_ARRAY_SIZE] = {0};
 		_app_generate_array (local_intervals_arr, RTL_NUMBER_OF (local_intervals_arr), _r_config_getlong (L"AutoreductIntervalValue", DEFAULT_AUTOREDUCTINTERVAL_VAL, NULL));
-		_r_menu_setitemtext (hsubmenu, 0, TRUE, _r_locale_getstring (IDS_TRAY_DISABLE));
 		// 使用局部数组并生成菜单项
 		_app_generate_menu (hsubmenu, IDX_TRAY_POPUP_2, local_intervals_arr, RTL_NUMBER_OF (local_intervals_arr), L"%lu min", 
 			_r_config_getlong (L"AutoreductIntervalValue", DEFAULT_AUTOREDUCTINTERVAL_VAL, NULL), _r_config_getboolean (L"AutoreductIntervalEnable", FALSE, NULL));
+	}
+
+	// 修复：在正确的子菜单中设置IDM_TRAY_DISABLE_1和IDM_TRAY_DISABLE_2菜单项
+	// 获取清理界限子菜单
+	hsubmenu = GetSubMenu (htraymenu, 1);
+	if (hsubmenu)
+	{
+		_r_menu_setitemtext (hsubmenu, IDM_TRAY_DISABLE_1, FALSE, _r_locale_getstring (IDS_TRAY_DISABLE));
+	}
+	
+	// 获取清理间隔子菜单
+	hsubmenu = GetSubMenu (htraymenu, 2);
+	if (hsubmenu)
+	{
+		_r_menu_setitemtext (hsubmenu, IDM_TRAY_DISABLE_2, FALSE, _r_locale_getstring (IDS_TRAY_DISABLE));
 	}
 
 	// Get current cursor position for menu display
